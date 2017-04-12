@@ -1,0 +1,2 @@
+* Description
+This is plugin add some function for read and analyze ~fasta~ file.
