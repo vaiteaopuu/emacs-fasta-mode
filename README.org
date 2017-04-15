@@ -1,4 +1,56 @@
 * Description
-This is plugin add some function for read and analyze ~fasta~ file. This plugin
+This is plugin add some functions for read and analyze ~fasta~ file. This plugin
 include coloration and some statistical analysis.
 
+* Installation
+Add the following file ~fasta-mode.el~ where emacs can find it. And load it from
+your ~init.el~
+
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/emacs_project/emacs_fasta/")
+  (require fasta-mode)
+#+end_src
+
+Then you can add the following line to enhance fasta-mode for each ~*.fa~.
+
+#+begin_src emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.fa\\'" . fasta-mode))
+#+end_src
+
+* Features
+
+** Notes
+
+Create a file ~notes.org~ in the current directory and append a header that
+corresponds to the current sequence header.
+
+#+begin_src org
+  ,*  fasta-seq-id
+  :PROPERTIES:
+  :IDS: fasta sequence id
+  :FULL-HEADER: full header herre
+  :END:
+  There are your notes
+#+end_src
+
+It takes the sequence header under the cursor as fasta-seq-id.
+
+
+** Keybindings
+
+#+caption: Keybindings table
+| action            | key-strokes |
+|-------------------+-------------|
+| fasta-up-header   | M-k         |
+| fasta-down-header | M-j         |
+| fasta-append-note | M-n         |
+
+* Stuff todo
+
+** Alignment
+
+Create a major mode to view and some python functions to perform alignments.
+
+** Fastq mode
+
+Create a fastq mode with syntax highlight.

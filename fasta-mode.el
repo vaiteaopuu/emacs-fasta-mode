@@ -1,11 +1,11 @@
 ;;; fasta-mode.el --- sample major mode for viewing fasta file
 
-;; Copyright © 2015, by vaitea OPUU
+;; Copyright © 2017, by vaitea OPUU
 
-;; Author: your name (vaiteaopuu@gmail.com)
+;; Author: vaitea OPUU (vaiteaopuu@gmail.com)
 ;; Version: 0.0.0
 ;; Created: 14 april 2017
-;; Keywords: fasta, sequences, dna, protein
+;; Keywords: fasta, sequences, dna, protein, viewing
 
 ;; This file is not part of GNU Emacs.
 
@@ -97,7 +97,7 @@
 (defvar fasta-header-symbol "^>")
 (defvar fasta-comment-symbol "^ *;")
 
-;; * Displacment function
+;; * motion function
 
 (defun fasta-down-header ()
   "Go to to the previous header"
@@ -134,15 +134,17 @@
   (interactive)
   ;; make sure that your at the beginning of header line
   (beginning-of-line)
-  (let ((start-name (save-excursion
-                      (re-search-forward "[^>]\\|[^ ]")))
+  (let (
+        (start-name (save-excursion
+                      ;; skip > and blank characters
+                      (re-search-forward "[^\>[:blank:]]" (line-end-position))))
         (end-name (save-excursion
-                    (re-search-forward " "))))
+                    (re-search-forward "> *\\([^[:blank:]]+\\)" (line-end-position)))))
     ;; If there something looking like > words_1 other words then it will save
     ;; the word_1.
     (when (and start-name end-name)
-      (copy-region-as-kill (- start-name 1) (- end-name 1))
-      (buffer-substring-no-properties (- start-name 1) (- end-name 1))
+      (copy-region-as-kill (- start-name 1) end-name)
+      (buffer-substring-no-properties (- start-name 1) end-name)
       ))
   )
 
@@ -151,18 +153,43 @@
 (defun fasta-append-new-note ()
   "Append a new note about a particular fasta sequence"
   (interactive)
-  ;; (message (fasta-get-seq-name-under-cursor))
+  (setq note-file "./notes.org")
 
-  (let ((new-fasta-entry (fasta-get-seq-name-under-cursor)))
-    (append-to-file (concat "* " new-fasta-entry "\n") nil "./test.org")
-    (message new-fasta-entry)
+  (if (file-exists-p note-file)
+      (message (format "adding new entry to: %s" note-file))
+    (let ()
+      (message (format "creating and adding new entry to: %s" note-file))
+      (create-file-buffer note-file)
+      (append-to-file "#+STARTUP: showeverything" nil note-file))
     )
-  (find-file-other-window "./test.org")
+
+  (let ((new-fasta-entry (fasta-get-seq-name-under-cursor))
+        (whole-header (fasta-get-whole-header)))
+    (message new-fasta-entry)
+    (fasta-note-template new-fasta-entry whole-header note-file)
+    (find-file-other-window note-file)
+    (goto-char (point-max))
+    (org-narrow-to-subtree)
+    (org-show-block-all)
+    )
   )
 
-(defun fasta-note-template (fasta-cur-header)
+(defun fasta-get-whole-header ()
+  "Get the whole fasta header"
+  (interactive)
+  (buffer-substring-no-properties
+   (line-beginning-position)
+   (line-end-position))
+  )
+
+(defun fasta-note-template (fasta-sequence-id whole-header note-file)
   "When appended, we retrieve other information from fasta header"
-  (let (()))
+  (append-to-file (format "\n* %s\n" fasta-sequence-id) nil note-file)
+  (append-to-file (format ":PROPERTIES:\n") nil note-file)
+  (append-to-file (format ":IDS: %s\n" (replace-regexp-in-string "\|" " " fasta-sequence-id)) nil note-file)
+  (append-to-file (format ":FULL-HEADER: %s\n" (replace-regexp-in-string "^> *"
+                                                                         "" whole-header)) nil note-file)
+  (append-to-file (format ":END:\n") nil note-file)
   )
 
 ;; * Bindings
@@ -178,18 +205,12 @@
   (let ((map (make-sparse-keymap))
         (menu-map (make-sparse-keymap "Lisp")))
     (set-keymap-parent map fasta-mode-shared-map)
-    map)
-  "TODO: Un mode mineur ")
+    map))
 
 ;; * Derivativ mode part
 (define-derived-mode fasta-mode fundamental-mode "fasta"
   "fasta-mode is a major mode for viewing fasta file."
 
-  ;; Syntax highlight
-  ;; (font-lock-add-keywords nil '(("A" . 'a--face)))
-  ;; (font-lock-add-keywords nil '(("T" . 't--face)))
-  ;; (font-lock-add-keywords nil '(("G" . 'g--face)))
-  ;; (font-lock-add-keywords nil '(("C" . 'c--face)))
   (font-lock-add-keywords nil '(("A\\|I\\|L\\|M\\|F\\|W\\|V\\|C" . 'ailmfwvc--face)))
   (font-lock-add-keywords nil '(("R\\|K" . 'rk--face)))
   (font-lock-add-keywords nil '(("C" . 'c--face)))
@@ -198,15 +219,13 @@
   (font-lock-add-keywords nil '(("G" . 'g--face)))
   (font-lock-add-keywords nil '(("H\\|Y" . 'hy--face)))
   (font-lock-add-keywords nil '(("P" . 'p--face)))
-  (font-lock-add-keywords nil '((">.*" . 'fasta-header-face)))
   (font-lock-add-keywords nil '((".*;.*$" . 'fasta-comment-face)))
-
+  (font-lock-add-keywords nil '((">.*" . 'fasta-header-face)))
 
   ;; Comment syntax
   (setq comment-start ";")
   (setq comment-end "")
 
-  ;; Use new key map
   )
 
 ;;;###autoload
