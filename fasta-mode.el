@@ -52,7 +52,7 @@
   "R & K residues colors")
 
 (defface nstq--face
-  '((t (:foreground "green")))
+  '((t (:foreground "LimeGreen")))
   "nst residues colors")
 
 (defface c--face
@@ -68,11 +68,11 @@
   "G residues colors")
 
 (defface hy--face
-  '((t (:foreground "cyan")))
+  '((t (:foreground "cyan3")))
   "H & Y residues colors")
 
 (defface p--face
-  '((t (:foreground "yellow")))
+  '((t (:foreground "yellow3")))
   "P residues colors")
 
 ;; ** Nucleotides faces
@@ -192,18 +192,42 @@
   (append-to-file (format ":END:\n") nil note-file)
   )
 
+;; * Narrow sequence
+
+(defun fasta-narrow-sequence ()
+  "Narrow the current fasta sequence"
+  (interactive)
+  (let (
+        (start (save-excursion
+                 (forward-char)
+                 (re-search-backward ">" (point-min) (point-min))))
+        (end (save-excursion
+               (forward-char)
+               (re-search-forward ">" (point-max) (point-max)))))
+    (message (format "%d %d" start end))
+    (narrow-to-region start (- end 1))
+    )
+  )
+
+(defun fasta-widen-sequence ()
+  "Widen to restore all other sequences"
+  (interactive)
+  (widen))
+
 ;; * Bindings
 (defvar fasta-mode-shared-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\M-j" 'fasta-down-header)
     (define-key map "\M-k" 'fasta-up-header)
     (define-key map "\M-n" 'fasta-append-new-note)
+    (define-key map "\M-w" 'fasta-narrow-sequence)
+    (define-key map "\M-W" 'fasta-widen-sequence)
     map)
   "Keymap for fasta mode")
 
 (defvar fasta-mode-map
   (let ((map (make-sparse-keymap))
-        (menu-map (make-sparse-keymap "Lisp")))
+        (menu-map (make-sparse-keymap "fasta")))
     (set-keymap-parent map fasta-mode-shared-map)
     map))
 
@@ -221,6 +245,13 @@
   (font-lock-add-keywords nil '(("P" . 'p--face)))
   (font-lock-add-keywords nil '((".*;.*$" . 'fasta-comment-face)))
   (font-lock-add-keywords nil '((">.*" . 'fasta-header-face)))
+
+  ;; If the size is greater than 1024^2 Emacs switch to read-only-mode in order
+  ;; to save performance.
+
+  (when (> (buffer-size) (* 1024 1024))
+    (setq buffer-read-only t)
+    (buffer-disable-undo))
 
   ;; Comment syntax
   (setq comment-start ";")
