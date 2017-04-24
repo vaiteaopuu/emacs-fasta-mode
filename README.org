@@ -1,6 +1,8 @@
 * Description
 This is plugin add some functions for read and analyze ~fasta~ file. This plugin
-include coloration and some statistical analysis.
+include residues highlight (from clustal scheme) and some statistical analysis
+(/incoming/). This package uses python (2.7) to perform analysis and emacs-lisp
+to display them into emacs buffers.
 
 * Installation
 Add the following file ~fasta-mode.el~ where emacs can find it. And load it from
@@ -19,6 +21,18 @@ Then you can add the following line to enhance fasta-mode for each ~*.fa~.
 
 * Features
 
+** Highlights
+
+#+begin_src fasta
+>sp|Q4G0N4|NAKD2_HUMAN NAD kinase 2, mitochondrial OS=Homo sapiens GN=NADK2 PE=1 SV=2
+MTCYRGFLLGSCCRVAGGRAAALRGPGAGGPAARPRLGGDGGGRRHLGQGQPRELAGCGS
+RADGGFRPSRVVVVAKTTRYEFEQQRYRYAELSEEDLKQLLALKGSSYSGLLERHHIHTK
+NVEHIIDSLRNEGIEVRLVKRREYDEETVRWADAVIAAGGDGTMLLAASKVLDRLKPVIG
+EKQKSSGLNLCTGTGSKAWSFNINRVATQAVEDVLNIAKRQGNLSLPLNRELVEKVTNEY
+NESLLYSPEEPKILFSIREPIANRVFSSSRQRCFSSKVCVRSRCWDACMVVDGGTSFEFN
+DGAIASMMINKEDELRTVLLEQCTG
+#+end_src
+
 ** Notes
 
 Create a file ~notes.org~ in the current directory and append a header that
@@ -35,15 +49,18 @@ corresponds to the current sequence header.
 
 It takes the sequence header under the cursor as fasta-seq-id.
 
-
 ** Keybindings
 
 #+caption: Keybindings table
-| action            | key-strokes |
-|-------------------+-------------|
-| fasta-up-header   | M-k         |
-| fasta-down-header | M-j         |
-| fasta-append-note | M-n         |
+| action                | key-strokes |
+|-----------------------+-------------|
+| fasta-up-header       | M-k         |
+| fasta-down-header     | M-j         |
+| fasta-append-note     | M-n         |
+| fasta-narrow-sequence | M-w         |
+| fasta-widen-sequence  | M-W         |
+
+Narrowing allow you to focus on the sequence under the cursor.
 
 * Stuff todo
 
@@ -51,6 +68,10 @@ It takes the sequence header under the cursor as fasta-seq-id.
 
 Create a major mode to view and some python functions to perform alignments.
 
-** Fastq mode
+** Combine python module and emacs-lisp
+
+Use python modules to perform analysis and emacs-lisp to print them into temporary buffers.
+
+** Other highlight mode (fastq, stockholm, ...)
 
 Create a fastq mode with syntax highlight.

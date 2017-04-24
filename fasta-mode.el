@@ -44,11 +44,11 @@
 ;; ** Residues faces
 
 (defface ailmfwvc--face
-  '((t (:foreground "blue")))
+  '((t (:foreground "blue2")))
   "A, I, L, M, F, W, V, C residues colors")
 
 (defface rk--face
-  '((t (:foreground "red")))
+  '((t (:foreground "red2")))
   "R & K residues colors")
 
 (defface nstq--face
