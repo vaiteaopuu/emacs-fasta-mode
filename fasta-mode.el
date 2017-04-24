@@ -244,7 +244,7 @@
   (font-lock-add-keywords nil '(("H\\|Y" . 'hy--face)))
   (font-lock-add-keywords nil '(("P" . 'p--face)))
   (font-lock-add-keywords nil '((".*;.*$" . 'fasta-comment-face)))
-  (font-lock-add-keywords nil '((">.*" . 'fasta-header-face)))
+  (font-lock-add-keywords nil '((">.*" . 'font-lock-function-name-face)))
 
   ;; If the size is greater than 1024^2 Emacs switch to read-only-mode in order
   ;; to save performance.

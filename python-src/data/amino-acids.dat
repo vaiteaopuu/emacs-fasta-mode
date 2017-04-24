@@ -1,0 +1,24 @@
+#############################################
+# Residue Informations                      #
+# Residue_name3 Residue_name1 Residue_group #
+#############################################
+ALA A ACT
+CYS C ACT
+GLU E ED
+ASP D ED
+PHE F FW
+ILE I IVL
+HIS H H
+LYS K K
+MET M M
+LEU L IVL
+ASN N NQ
+GLN Q NQ
+SER S S
+ARG R R
+THR T ACT
+TRP W FW
+VAL V IVL
+TYR Y Y
+PRO P PG
+GLY G PG
