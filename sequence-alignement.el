@@ -67,6 +67,7 @@ on the column sequence (i, -j) if we add a gap on the line sequence."
   )
 
 ;;; Motion in the display alignmnet buffer
+
 ;;; Derive
 
 (define-derived-mode alignment-mode special-mode "alignment"

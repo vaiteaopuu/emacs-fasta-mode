@@ -200,12 +200,13 @@
   (let (
         (start (save-excursion
                  (forward-char)
-                 (re-search-backward ">" (point-min) (point-min))))
+                 (re-search-backward ">" nil t)))
         (end (save-excursion
                (forward-char)
-               (re-search-forward ">" (point-max) (point-max)))))
-    (message (format "%d %d" start end))
-    (narrow-to-region start (- end 1))
+               (re-search-forward ">" nil t))))
+    (if end
+        (narrow-to-region start (- end 1))
+      (narrow-to-region start (point-max)))
     )
   )
 
@@ -213,6 +214,17 @@
   "Widen to restore all other sequences"
   (interactive)
   (widen))
+
+;; * Functions
+
+;; ** Count sequences
+
+(defun fasta-count-sequence ()
+  "Count the number of sequences in the current fasta buffer"
+  (interactive)
+  (let ((count (count-matches "^>.*" 1)))
+  (message (format "there are %d sequences" count)))
+  )
 
 ;; * Bindings
 (defvar fasta-mode-shared-map
@@ -222,6 +234,7 @@
     (define-key map "\M-n" 'fasta-append-new-note)
     (define-key map "\M-w" 'fasta-narrow-sequence)
     (define-key map "\M-W" 'fasta-widen-sequence)
+    (define-key map "\M-c" 'fasta-count-sequence)
     map)
   "Keymap for fasta mode")
 

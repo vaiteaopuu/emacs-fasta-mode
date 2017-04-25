@@ -59,6 +59,7 @@ It takes the sequence header under the cursor as fasta-seq-id.
 | fasta-append-note     | M-n         |
 | fasta-narrow-sequence | M-w         |
 | fasta-widen-sequence  | M-W         |
+| fasta-count-sequences | M-c         |
 
 Narrowing allow you to focus on the sequence under the cursor.
 
