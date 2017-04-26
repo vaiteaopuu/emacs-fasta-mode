@@ -159,8 +159,35 @@ def fasta_format(sequence, nb_col=80):
     return temp
 
 
+def count_res(infile):
+    """Count and make % of residues population
+    """
+    results = {}
+    with open(infile) as fasta_file:
+        for line in fasta_file:
+            if not line.startswith(">") and not line.startswith(";"):
+                for elem in set(line.strip()):
+                    try:
+                        results[elem] += line.count(elem)
+                    except KeyError:
+                        results[elem] = line.count(elem)
+    return results
+
+
+def print_stat(statistics):
+    """Print statistics
+    """
+    printable = "\n".join([
+        str(elem) + " " + str(count) for elem, count in statistics.iteritems()
+    ])
+    return printable
+
+
+# GLOBAL VARIABLES ############################################################
 global PROPERTIES, CLASSES
-PROPERTIES, CLASSES = get_res_from_file(), get_res_from_file()
+
+# PROPERTIES, CLASSES = get_res_from_file(), get_res_from_file()
+# GLOBAL VARIABLES ############################################################
 
 
 def main():
@@ -170,11 +197,16 @@ def main():
     This module contains a fasta parser
                                                  """)
     parser.add_argument('-f', '--fasta', dest='fasta_file')
+    parser.add_argument('-a', '--action', dest='action')
     args = parser.parse_args()
     global PROPERTIES, CLASSES
-    PROPERTIES, CLASSES = get_res_from_file(), get_res_from_file()
-    sequences = parse_fasta_file(args.fasta_file)
-    print "".join(str(seq) for seq in sequences)
+    if args.action.upper() == "ALIGN":
+        print "test"
+        # PROPERTIES, CLASSES = get_res_from_file(), get_res_from_file()
+        # sequences = parse_fasta_file(args.fasta_file)
+        # print "".join(str(seq) for seq in sequences)
+    elif args.action.upper() == "COUNT":
+        print print_stat(count_res(args.fasta_file))
 
 
 if __name__ == '__main__':

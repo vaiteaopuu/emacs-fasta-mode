@@ -192,6 +192,26 @@
   (append-to-file (format ":END:\n") nil note-file)
   )
 
+;; ** Count sequences
+
+(defun fasta-count-sequence ()
+  "Count the number of sequences in the current fasta buffer"
+  (interactive)
+  (let ((count (count-matches "^>.*" 1)))
+    (message (format "there are %d sequences" count)))
+  )
+
+;; ** Make statistics
+
+;TODO: REMOVE THIS ABSOLUTE PATH
+(defun fasta-prcent-aa ()
+  "Count number of each residue on each sequences"
+  (interactive)
+  (message "Counting number of each residue")
+  (setq values (shell-command-to-string (concat "python " "~/emacs_project/emacs_fasta/python-src/seq_tools.py -f " (buffer-file-name) " -a count")))
+  (message values)
+  )
+
 ;; * Narrow sequence
 
 (defun fasta-narrow-sequence ()
@@ -215,17 +235,6 @@
   (interactive)
   (widen))
 
-;; * Functions
-
-;; ** Count sequences
-
-(defun fasta-count-sequence ()
-  "Count the number of sequences in the current fasta buffer"
-  (interactive)
-  (let ((count (count-matches "^>.*" 1)))
-  (message (format "there are %d sequences" count)))
-  )
-
 ;; * Bindings
 (defvar fasta-mode-shared-map
   (let ((map (make-sparse-keymap)))
@@ -235,6 +244,7 @@
     (define-key map "\M-w" 'fasta-narrow-sequence)
     (define-key map "\M-W" 'fasta-widen-sequence)
     (define-key map "\M-c" 'fasta-count-sequence)
+    (define-key map "\M-C" 'fasta-prcent-aa)
     map)
   "Keymap for fasta mode")
 
