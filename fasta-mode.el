@@ -209,7 +209,7 @@
   "Count number of each residue on each sequences"
   (interactive)
   (message "Counting number of each residue")
-  (setq values (shell-command-to-string (concat "python " "~/emacs_project/emacs_fasta/python-src/seq_tools.py -f " (buffer-file-name) " -a count")))
+  (setq values (shell-command-to-string (concat "python " "~/.add/emacs-fasta-mode/python-src/seq_tools.py -f " (buffer-file-name) " -a count")))
   (message values)
   )
 
