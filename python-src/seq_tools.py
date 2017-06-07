@@ -1,5 +1,6 @@
 import argparse
 import re
+from data import *
 
 # Description #################################################################
 # This module contains some classes definition for fasta sequences
@@ -16,14 +17,14 @@ class Sequence:
         Keyword Arguments:
         """
         self.seq_name = seq_name
-        self.sequence = Sequence_elem(None)
+        self.sequence = ""
 
     def __iadd__(self, seq_piece):
-        self.sequence += Sequence_elem(seq_piece)
+        self.sequence += seq_piece.strip("\r\n")
         return self
 
     def __add__(self, seq_piece):
-        self.sequence += Sequence_elem(seq_piece)
+        self.sequence += seq_piece.strip("\r\n")
         return self
 
     def __len__(self):
@@ -39,70 +40,6 @@ class Sequence:
     def __repr__(self):
         return ">{}\n{}\n".format(self.seq_name,
                                   fasta_format(str(self.sequence)))
-
-
-class Sequence_elem:
-    """This class represents the residue or nucleotide.
-    """
-
-    def __init__(self, elem_in_string):
-        """This class will take a string like ACGTTTG and transform it into a
-        list of sequence elements.
-        Keyword Arguments:
-        self           -- itself
-        elem_in_string -- string
-        """
-        if elem_in_string is None:
-            self.elements = []
-        else:
-            self.elements = [Element(elem) for elem in elem_in_string]
-
-    def __add__(self, elements):
-        self.elements += elements
-        return self
-
-    def __iadd__(self, elements):
-        self.elements += elements
-        return self
-
-    def __getitem__(self, pos):
-        return self.elements[pos]
-
-    def __contains__(self, elem):
-        return elem in self.elements
-
-    def __len__(self):
-        return len(self.elements)
-
-    def __str__(self):
-        return "".join(str(elem) for elem in self.elements)
-
-    def __repr__(self):
-        return "".join(str(elem) for elem in self.elements)
-
-
-class Element:
-    """This class represents amino-acids or nucleotides
-    """
-
-    def __init__(self, elem_char):
-        """This constructor take a character like A or C and build a Element object
-        Keyword Arguments:
-        self      -- itself
-        elem_char -- Residue or nucleotide as character
-        """
-        self.elem_name = elem_char
-        self.elem_proterty = PROPERTIES[elem_char]
-        self.elem_class = CLASSES[elem_char]
-
-    def __str__(self):
-        return self.elem_name
-
-    def __repr__(self):
-        return self.elem_name
-
-    def __eq__(self, elem):
-        return self.elem_name == elem.elem_name
 
 
 def parse_fasta_file(fasta_file):
@@ -130,16 +67,11 @@ def parse_header(line):
         return None
 
 
-def get_res_from_file(data_file="./data/amino-acids.dat"):
+def get_res_from_file():
     """Read residue information from data file
     """
-    word = re.compile("\S+")
     results = {}
-    with open(data_file) as res_file:
-        for line in res_file:
-            if not line.startswith("#") and len(line) > 0:
-                val = word.findall(line)
-                results[val[1]] = val[2]
+    results = {aa_1: aa_grp for aa_1, aa_grp in zip(RESIDUE_1, RESIDUE_GROUP)}
     return results
 
 
@@ -159,6 +91,35 @@ def fasta_format(sequence, nb_col=80):
     return temp
 
 
+def count_res(infile):
+    """Count and make % of residues population
+    """
+    results = {}
+    with open(infile) as fasta_file:
+        for line in fasta_file:
+            if not line.startswith(">") and not line.startswith(";"):
+                for elem in set(line.strip()):
+                    try:
+                        results[elem] += line.count(elem)
+                    except KeyError:
+                        results[elem] = line.count(elem)
+    return results
+
+
+def print_stat(statistics):
+    """Print statistics
+    """
+    nb_total = sum(statistics.values())
+    results = []
+    for elem, count in statistics.items():
+        value = float(count) / nb_total
+        results.append(
+            str(elem) + "\t- " + str(round(100 * value, 1)) + "\t" + int(
+                100 * value) * "=" + ">")
+    return "\n".join(results)
+
+
+# GLOBAL VARIABLES ############################################################
 global PROPERTIES, CLASSES
 PROPERTIES, CLASSES = get_res_from_file(), get_res_from_file()
 
@@ -170,11 +131,15 @@ def main():
     This module contains a fasta parser
                                                  """)
     parser.add_argument('-f', '--fasta', dest='fasta_file')
+    parser.add_argument('-a', '--action', dest='action')
     args = parser.parse_args()
     global PROPERTIES, CLASSES
-    PROPERTIES, CLASSES = get_res_from_file(), get_res_from_file()
-    sequences = parse_fasta_file(args.fasta_file)
-    print "".join(str(seq) for seq in sequences)
+    if args.action.upper() == "ALIGN":
+        PROPERTIES, CLASSES = get_res_from_file(), get_res_from_file()
+        sequences = parse_fasta_file(args.fasta_file)
+        print "".join(str(seq) for seq in sequences)
+    elif args.action.upper() == "COUNT":
+        print print_stat(count_res(args.fasta_file))
 
 
 if __name__ == '__main__':

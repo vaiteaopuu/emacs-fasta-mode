@@ -9,38 +9,30 @@ import seq_tools as st
 global GAP_PENALITY
 
 
-def sequence_alignment(seq_a, seq_b, matrix):
-    """This function perform the alignment.
-    Keyword Arguments:
-    seq_a  -- fst sequence
-    seq_b  -- snd sequence
-    matrix -- substitution matrix
-    """
-    score_matrix, path_matrix = create_matrix(seq_a, seq_b, matrix)
-
-
-def init_matrix(seq_a, seq_b):
-    """This function return 2 matrix initialized.
-    """
-    path_matrix = np.array()
-    score_matrix = np.array()
-
-
 def create_matrix(seq_a, seq_b, matrix):
     """This function take 2 sequences and return 2 matrix.
     Keyword Arguments:
-    seq_a  -- fst sequence
-    seq_b  -- snd sequence
-    matrix -- substitution matrix
     """
     len_seq_a, len_seq_b = len(seq_a), len(seq_b)
-    score_matrix = [[0 for i in range(len_seq_a)] for j in range(len_seq_b)]
-    path_matrix = [[None for i in range(len_seq_a)] for j in range(len_seq_b)]
+    score_init = lambda (i, j): i * GAP_PENALITY if j == 0 else (j * GAP_PENALITY if i == 0 else 0)
+    path_init = lambda (i, j): "l" if j == 0 else ("u" if i == 0 else None)
 
-    for ind_a, elem_a in enumerate(seq_a):
-        for ind_b, elem_b in enumerate(seq_b):
-            fill_matrix(ind_a, ind_b, elem_a, elem_b, score_matrix,
-                        path_matrix)
+    score_matrix = [[score_init((i, j)) for i in range(len_seq_a + 1)]
+                    for j in range(len_seq_b + 1)]
+    path_matrix = [[path_init((i, j)) for i in range(len_seq_a + 1)]
+                   for j in range(len_seq_b + 1)]
+
+    for ind_a, elem_a in enumerate(seq_a, start=1):
+        for ind_b, elem_b in enumerate(seq_b, start=1):
+            if ind_a == 0:
+                score_matrix[ind_b][ind_a] = GAP_PENALITY * ind_b
+                path_matrix[ind_b][ind_a] = "u"
+            elif ind_b == 0:
+                score_matrix[ind_b][ind_a] = GAP_PENALITY * ind_a
+                path_matrix[ind_b][ind_a] = "l"
+            else:
+                fill_matrix(ind_a, ind_b, elem_a, elem_b, score_matrix,
+                            path_matrix)
 
     return score_matrix, path_matrix
 
@@ -49,12 +41,6 @@ def fill_matrix(ind_a, ind_b, elem_a, elem_b, score_matrix, path_matrix):
     """This function take the index of elem a from the first sequence and the
     second sequence. This function will modified the path and score matrix.
     Keyword Arguments:
-    ind_a        -- index of elem_a
-    ind_b        -- indec of elem_b
-    elem_a       -- elements of sequence a at index ind_a
-    elem_b       -- elements of sequence b at index ind_b
-    score_matrix -- matrix of score
-    path_matrix  -- matrix of path
     """
     score_a_b = get_score(elem_a, elem_b)
     results = [
@@ -70,8 +56,6 @@ def fill_matrix(ind_a, ind_b, elem_a, elem_b, score_matrix, path_matrix):
 def get_score(elem_a, elem_b, matrix_substitution=None):
     """This function take the elements.
     Keyword Arguments:
-    elem_a -- element of the first sequence
-    elem_b -- element of the second sequence
     """
     if matrix_substitution is not None:
         return matrix_substitution[elem_a][elem_b]
@@ -85,33 +69,27 @@ def backtracking(path_matrix, seq_a, seq_b):
     """
     alignment_a = ""
     alignment_b = ""
-    pos_i, pos_j = len(seq_b) - 1, len(seq_a) - 1
+    pos_i, pos_j = len(seq_b), len(seq_a)
     while pos_i >= 0 and pos_j >= 0:
-        print "---------------------------"
-        print "pos_i", pos_i, "pos_j", pos_j
-        print "res_b", seq_b[pos_i], "res_a", seq_a[pos_j]
-        print seq_a[pos_j:]
-        print seq_b[pos_i:]
-
         if pos_i == 0:
-            alignment_a += seq_a[pos_j:]
-            alignment_b += "-" * len(seq_a[pos_j:])
+            alignment_a += seq_a[:pos_j][::-1]
+            alignment_b += "-" * len(seq_b[:pos_j])
             break
         elif pos_j == 0:
-            alignment_a += "-" * len(seq_b[pos_i:])
-            alignment_b += str(seq_b[pos_i:])
+            alignment_a += "-" * len(seq_a[:pos_i])
+            alignment_b += seq_b[:pos_i][::-1]
             break
         elif path_matrix[pos_i][pos_j] == "d":
-            alignment_a += str(seq_a[pos_j])
-            alignment_b += str(seq_b[pos_i])
+            alignment_a += seq_a[pos_j - 1]
+            alignment_b += seq_b[pos_i - 1]
             pos_i -= 1
             pos_j -= 1
         elif path_matrix[pos_i][pos_j] == "u":
             alignment_a += "-"
-            alignment_b += str(seq_b[pos_i])
+            alignment_b += seq_b[pos_i - 1]
             pos_i -= 1
         elif path_matrix[pos_i][pos_j] == "l":
-            alignment_a += str(seq_a[pos_j])
+            alignment_a += seq_a[pos_j - 1]
             alignment_b += "-"
             pos_j -= 1
     return alignment_a[::-1], alignment_b[::-1]
