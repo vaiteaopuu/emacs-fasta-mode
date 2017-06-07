@@ -190,6 +190,7 @@
   (append-to-file (format ":FULL-HEADER: %s\n" (replace-regexp-in-string "^> *"
                                                                          "" whole-header)) nil note-file)
   (append-to-file (format ":END:\n") nil note-file)
+  (append-to-file (insert-date))
   )
 
 ;; ** Count sequences
@@ -210,6 +211,40 @@
   (message "Counting number of each residue")
   (setq values (shell-command-to-string (concat "python " "~/emacs_project/emacs_fasta/python-src/seq_tools.py -f " (buffer-file-name) " -a count")))
   (message values)
+  )
+
+;; ** Selection of sequence
+
+(defun fasta-select-sequence ()
+  "yank the whole sequence under the cursor"
+  (interactive)
+  (let ((start-sequence (save-excursion
+                          (forward-char)
+                          (re-search-backward ">" nil 't)))
+        (end-sequence (save-excursion
+                        (forward-char)
+                        (re-search-forward ">" nil 't))))
+
+    (if (and start-sequence end-sequence)
+      (progn
+        (message (format "%S to %S" start-sequence (- end-sequence 100)))
+        (let ((selected-sequence (buffer-substring-no-properties start-sequence (- end-sequence 1))))
+          (message selected-sequence))
+        )
+      (progn
+        (when start-sequence
+          (message (format "last sequence"))
+          (let ((selected-sequence (buffer-substring-no-properties start-sequence (point-max))))
+            (message selected-sequence))
+          )
+        (when end-sequence
+          (message (format "first sequence"))
+          (let ((selected-sequence (buffer-substring-no-properties (point-min) end-sequence)))
+            (message selected-sequence))
+          )
+        )
+      )
+    )
   )
 
 ;; * Narrow sequence
@@ -245,6 +280,7 @@
     (define-key map "\M-W" 'fasta-widen-sequence)
     (define-key map "\M-c" 'fasta-count-sequence)
     (define-key map "\M-C" 'fasta-prcent-aa)
+    (define-key map "\M-s" 'fasta-select-sequence)
     map)
   "Keymap for fasta mode")
 
@@ -255,6 +291,7 @@
     map))
 
 ;; * Derivativ mode part
+
 (define-derived-mode fasta-mode fundamental-mode "fasta"
   "fasta-mode is a major mode for viewing fasta file."
 
@@ -283,7 +320,7 @@
   )
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.fa\\'" . wpdl-mode))
+(add-to-list 'auto-mode-alist '("\\.fa\\'" . fasta-mode))
 
 ;; add the mode to the `features' list
 (provide 'fasta-mode)

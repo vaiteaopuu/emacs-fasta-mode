@@ -1,5 +1,6 @@
 import argparse
 import re
+from data import *
 
 # Description #################################################################
 # This module contains some classes definition for fasta sequences
@@ -66,16 +67,11 @@ def parse_header(line):
         return None
 
 
-def get_res_from_file(data_file="./data/amino-acids.dat"):
+def get_res_from_file():
     """Read residue information from data file
     """
-    word = re.compile("\S+")
     results = {}
-    with open(data_file) as res_file:
-        for line in res_file:
-            if not line.startswith("#") and len(line) > 0:
-                val = word.findall(line)
-                results[val[1]] = val[2]
+    results = {aa_1: aa_grp for aa_1, aa_grp in zip(RESIDUE_1, RESIDUE_GROUP)}
     return results
 
 
@@ -118,7 +114,7 @@ def print_stat(statistics):
     for elem, count in statistics.items():
         value = float(count) / nb_total
         results.append(
-            str(elem) + "\t-" + str(round(100 * value, 2)) + "\t" + int(
+            str(elem) + "\t- " + str(round(100 * value, 1)) + "\t" + int(
                 100 * value) * "=" + ">")
     return "\n".join(results)
 
