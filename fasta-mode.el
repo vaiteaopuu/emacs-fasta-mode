@@ -34,7 +34,7 @@
 
 ;; ** Header & comments
 (defface fasta-header-face
-  '((t (:foreground "Red" :weight bold)))
+  '((t (:foreground "Indianred3" :weight bold)))
   "red")
 
 (defface fasta-comment-face
@@ -44,7 +44,7 @@
 ;; ** Residues faces
 
 (defface ailmfwvc--face
-  '((t (:foreground "blue2")))
+  '((t (:foreground "RoyalBlue")))
   "A, I, L, M, F, W, V, C residues colors")
 
 (defface rk--face
@@ -248,14 +248,14 @@
 (define-derived-mode fasta-mode fundamental-mode "fasta"
   "fasta-mode is a major mode for viewing fasta file."
 
-  (font-lock-add-keywords nil '(("A\\|I\\|L\\|M\\|F\\|W\\|V\\|C" . 'ailmfwvc--face)))
-  (font-lock-add-keywords nil '(("R\\|K" . 'rk--face)))
-  (font-lock-add-keywords nil '(("C" . 'c--face)))
-  (font-lock-add-keywords nil '(("N\\|S\\|T\\|Q" . 'nstq--face)))
-  (font-lock-add-keywords nil '(("E\\|D" . 'ed--face)))
-  (font-lock-add-keywords nil '(("G" . 'g--face)))
-  (font-lock-add-keywords nil '(("H\\|Y" . 'hy--face)))
-  (font-lock-add-keywords nil '(("P" . 'p--face)))
+  (font-lock-add-keywords nil '(("a\\|i\\|l\\|m\\|f\\|w\\|v\\|c\\|A\\|I\\|L\\|M\\|F\\|W\\|V\\|C" . 'ailmfwvc--face)))
+  (font-lock-add-keywords nil '(("r\\|k\\|R\\|K" . 'rk--face)))
+  (font-lock-add-keywords nil '(("c\\|C" . 'c--face)))
+  (font-lock-add-keywords nil '(("n\\|s\\|t\\|q\\|N\\|S\\|T\\|Q" . 'nstq--face)))
+  (font-lock-add-keywords nil '(("e\\|d\\|E\\|D" . 'ed--face)))
+  (font-lock-add-keywords nil '(("g\\|G" . 'g--face)))
+  (font-lock-add-keywords nil '(("h\\|y\\|H\\|Y" . 'hy--face)))
+  (font-lock-add-keywords nil '(("p\\|P" . 'p--face)))
   (font-lock-add-keywords nil '((".*;.*$" . 'fasta-comment-face)))
   (font-lock-add-keywords nil '((">.*" . 'font-lock-function-name-face)))
 
