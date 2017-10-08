@@ -113,15 +113,21 @@ def print_stat(statistics):
     results = []
     for elem, count in statistics.items():
         value = float(count) / nb_total
-        results.append(
-            str(elem) + "\t- " + str(round(100 * value, 1)) + "\t" + int(
+        try:
+            results.append(
+                CODAGE[elem] + "\t(" + elem + ")\t- " + "%3.1f "%round(100 * value, 1) + "\t" + int(
                 100 * value) * "=" + ">")
-    return "\n".join(results)
+        except KeyError:
+            results.append(
+                elem + "\t(" + elem + ")\t- " + "%3.1f "%round(100 * value, 1) + "\t" + int(
+                100 * value) * "=" + ">")
+    return "Amino-acid composition\n----------------------\n"+"\n".join(results)
 
 
 # GLOBAL VARIABLES ############################################################
-global PROPERTIES, CLASSES
+global PROPERTIES, CLASSES, CODAGE
 PROPERTIES, CLASSES = get_res_from_file(), get_res_from_file()
+CODAGE = {letter_1: letter_3 for letter_1, letter_3 in zip(RESIDUE_1, RESIDUE_3)}
 
 
 def main():

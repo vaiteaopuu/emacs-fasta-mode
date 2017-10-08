@@ -12,7 +12,7 @@
 ;;; License:
 
 ;; You can redistribute this program and/or modify it under the terms of the GNU
-;; General Public License version 2.
+;; General Public License version 3.
 
 ;;; Commentary:
 

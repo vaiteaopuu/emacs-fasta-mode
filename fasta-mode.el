@@ -12,7 +12,7 @@
 ;;; License:
 
 ;; You can redistribute this program and/or modify it under the terms of the GNU
-;; General Public License version 2.
+;; General Public License version 3.
 
 ;;; Commentary:
 
@@ -208,9 +208,10 @@
 (defun fasta-prcent-aa ()
   "Count number of each residue on each sequences"
   (interactive)
-  (message "Counting number of each residue")
-  (setq values (shell-command-to-string (concat "python " "~/.add/emacs-fasta-mode/python-src/seq_tools.py -f " (buffer-file-name) " -a count")))
-  (message values)
+  (with-output-to-temp-buffer "*amino-acids-composition*"
+    (shell-command (concat "python " "~/.add/emacs-fasta-mode/python-src/seq_tools.py -f " (buffer-file-name) " -a count")  "*amino-acids-composition*" "Message")
+    (pop-to-buffer "*amino-acids-composition*")
+    )
   )
 
 ;; ** Selection of sequence
@@ -229,18 +230,24 @@
       (progn
         (message (format "%S to %S" start-sequence (- end-sequence 100)))
         (let ((selected-sequence (buffer-substring-no-properties start-sequence (- end-sequence 1))))
-          (message selected-sequence))
+          (message selected-sequence)
+          (kill-new selected-sequence)
+          )
         )
       (progn
         (when start-sequence
           (message (format "last sequence"))
           (let ((selected-sequence (buffer-substring-no-properties start-sequence (point-max))))
-            (message selected-sequence))
+            (message selected-sequence)
+            (kill-new selected-sequence)
+            )
           )
         (when end-sequence
           (message (format "first sequence"))
           (let ((selected-sequence (buffer-substring-no-properties (point-min) end-sequence)))
-            (message selected-sequence))
+            (message selected-sequence)
+            (kill-new selected-sequence)
+            )
           )
         )
       )
