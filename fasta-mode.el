@@ -209,7 +209,7 @@
   "Count number of each residue on each sequences"
   (interactive)
   (with-output-to-temp-buffer "*amino-acids-composition*"
-    (shell-command (concat "python " "~/.add/emacs-fasta-mode/python-src/seq_tools.py -f " (buffer-file-name) " -a count")  "*amino-acids-composition*" "Message")
+    (shell-command (concat "python " path-to-fasta-mode "emacs-fasta-mode/python-src/seq_tools.py -f " (buffer-file-name) " -a count")  "*amino-acids-composition*" "Message")
     (pop-to-buffer "*amino-acids-composition*")
     )
   )

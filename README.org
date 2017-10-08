@@ -9,8 +9,9 @@ Add the following file ~fasta-mode.el~ where emacs can find it. And load it from
 your ~init.el~
 
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "/path-to/emacs_fasta/")
-  (require 'fasta-mode)
+(add-to-list 'load-path "/path-to/emacs_fasta/")
+(setq path-to-fasta-mode "~/path-to/emacs_fasta/")
+(require 'fasta-mode)
 #+end_src
 
 Then you can add the following line to enhance fasta-mode for each ~*.fa~.
@@ -60,6 +61,7 @@ It takes the sequence header under the cursor as fasta-seq-id.
 | fasta-narrow-sequence | M-w         |
 | fasta-widen-sequence  | M-W         |
 | fasta-count-sequences | M-c         |
+| fasta-prcent-aa       | M-C         |
 
 Narrowing allow you to focus on the sequence under the cursor.
 
